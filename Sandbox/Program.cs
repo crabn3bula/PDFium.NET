@@ -1,6 +1,5 @@
 ﻿using System;
 using PDFium.NET;
-using PDFium.NET.Native;
 
 namespace Sandbox
 {
@@ -13,7 +12,7 @@ namespace Sandbox
             using (var document = Document.Load(testFile, ""))
             {
                 Console.WriteLine($"Document {testFile} is opened");
-                Console.WriteLine($"Pages count is ${document.PagesCount}");
+                Console.WriteLine($"Pages count is {document.PagesCount}");
             }
 
             Console.ReadLine();

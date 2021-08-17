@@ -23,6 +23,7 @@ namespace PDFium.NET
 
         public void Dispose()
         {
+            Bindings.CloseDocument(_handle);
             _handle.Dispose();
         }
     }
