@@ -1,5 +1,7 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
+[assembly: InternalsVisibleTo("PDFium.NET.Test")]
 namespace PDFium.NET.Native
 {
     static class Bindings
