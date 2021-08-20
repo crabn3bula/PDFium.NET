@@ -21,6 +21,12 @@ namespace PDFium.NET
             PagesCount = Bindings.GetPageCount(_handle);
         }
 
+        public Page GetPage(int pageIndex)
+        {
+            var pageHandle = Bindings.LoadPage(_handle, pageIndex);
+            return new Page(pageHandle);
+        }
+
         public void Dispose()
         {
             Bindings.CloseDocument(_handle);

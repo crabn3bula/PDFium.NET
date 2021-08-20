@@ -3,9 +3,9 @@ using System.Runtime.InteropServices;
 
 namespace PDFium.NET.Native
 {
-    class DocumentHandle : SafeHandle
+    class PageHandle : SafeHandle
     {
-        private DocumentHandle() : base(IntPtr.Zero, true) {}
+        private PageHandle() : base(IntPtr.Zero, true) {}
 
         public override bool IsInvalid => handle == IntPtr.Zero;
 

@@ -33,6 +33,22 @@ namespace PDFium.NET.Native
         }
 
         [DllImport(NativeLibrary)]
+        private static extern PageHandle FPDF_LoadPage(DocumentHandle document, int page_index);
+
+        public static PageHandle LoadPage(DocumentHandle document, int pageIndex)
+        {
+            return FPDF_LoadPage(document, pageIndex);
+        }
+
+        [DllImport(NativeLibrary)]
+        private static extern void FPDF_ClosePage(PageHandle page);
+
+        public static void ClosePage(PageHandle page)
+        {
+            FPDF_ClosePage(page);
+        }
+
+        [DllImport(NativeLibrary)]
         private static extern int FPDF_GetPageCount(DocumentHandle document);
 
         public static int GetPageCount(DocumentHandle document)
