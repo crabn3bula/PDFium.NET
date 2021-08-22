@@ -34,6 +34,65 @@ namespace PDFium.NET.Native
         FPDF_ERR_XFALAYOUT = 8 // Layout XFA error.
     }
 
+    [Flags]
+    public enum PageRenderingFlags
+    {
+        FPDF_ANNOT = 0x01,
+        // Set if using text rendering optimized for LCD display. This flag will only
+        // take effect if anti-aliasing is enabled for text.
+        FPDF_LCD_TEXT = 0x02,
+        // Don't use the native text output available on some platforms
+        FPDF_NO_NATIVETEXT = 0x04,
+        // Grayscale output.
+        FPDF_GRAYSCALE = 0x08,
+        // Obsolete, has no effect, retained for compatibility.
+        FPDF_DEBUG_INFO = 0x80,
+        // Obsolete, has no effect, retained for compatibility.
+        FPDF_NO_CATCH = 0x100,
+        // Limit image cache size.
+        FPDF_RENDER_LIMITEDIMAGECACHE = 0x200,
+        // Always use halftone for image stretching.
+        FPDF_RENDER_FORCEHALFTONE = 0x400,
+        // Render for printing.
+        FPDF_PRINTING = 0x800,
+        // Set to disable anti-aliasing on text. This flag will also disable LCD
+        // optimization for text rendering.
+        FPDF_RENDER_NO_SMOOTHTEXT = 0x1000,
+        // Set to disable anti-aliasing on images.
+        FPDF_RENDER_NO_SMOOTHIMAGE = 0x2000,
+        // Set to disable anti-aliasing on paths.
+        FPDF_RENDER_NO_SMOOTHPATH = 0x4000,
+        // Set whether to render in a reverse Byte order, this flag is only used when
+        // rendering to a bitmap.
+        FPDF_REVERSE_BYTE_ORDER = 0x10,
+        // Set whether fill paths need to be stroked. This flag is only used when
+        // FPDF_COLORSCHEME is passed in, since with a single fill color for paths the
+        // boundaries of adjacent fill paths are less visible.
+        FPDF_CONVERT_FILL_TO_STROKE = 0x20
+    }
+
+    public class FS_RECTF
+    {
+        public float left;
+        public float top;
+        public float right;
+        public float bottom;
+    }
+
+    public class FS_SIZEF
+    {
+        public float width;
+        public float height;
+    }
+
+    public class FPDF_COLORSCHEME
+    {
+        int path_fill_color;
+        int path_stroke_color;
+        int text_fill_color;
+        int text_stroke_color;
+    }
+
     static class Bindings
     {
         private const string NativeLibrary = "pdfium.dll";
@@ -93,7 +152,8 @@ namespace PDFium.NET.Native
         }
 
         [DllImport(NativeLibrary)]
-        private static extern DocumentHandle FPDF_LoadMemDocument64(DocumentHandle data_buf, long size, string password);
+        private static extern DocumentHandle
+            FPDF_LoadMemDocument64(DocumentHandle data_buf, long size, string password);
 
         public static DocumentHandle LoadMemDocument64(DocumentHandle dataBuffer, long size, string password)
         {
@@ -119,12 +179,45 @@ namespace PDFium.NET.Native
         }
 
         [DllImport(NativeLibrary)]
-        private static extern void FPDF_CloseDocument(DocumentHandle document);
+        private static extern bool FPDF_DocumentHasValidCrossReferenceTable(DocumentHandle document);
 
-        public static void CloseDocument(DocumentHandle document)
+        public static bool DocumentHasValidCrossReferenceTable(DocumentHandle document)
         {
-            FPDF_CloseDocument(document);
+            return FPDF_DocumentHasValidCrossReferenceTable(document);
         }
+
+        [DllImport(NativeLibrary)]
+        private static extern int FPDF_GetTrailerEnds(DocumentHandle document, out byte[] buffer, long length);
+
+        public static int GetTrailerEnds(DocumentHandle document, out byte[] buffer, long length)
+        {
+            return FPDF_GetTrailerEnds(document, out buffer, length);
+        }
+
+        [DllImport(NativeLibrary)]
+        private static extern long FPDF_GetDocPermissions(DocumentHandle document);
+
+        public static long GetDocPermissions(DocumentHandle document)
+        {
+            return FPDF_GetDocPermissions(document);
+        }
+
+        [DllImport(NativeLibrary)]
+        private static extern int FPDF_GetSecurityHandlerRevision(DocumentHandle document);
+
+        public static int GetSecurityHandlerRevision(DocumentHandle document)
+        {
+            return FPDF_GetSecurityHandlerRevision(document);
+        }
+
+        [DllImport(NativeLibrary)]
+        private static extern int FPDF_GetPageCount(DocumentHandle document);
+
+        public static int GetPageCount(DocumentHandle document)
+        {
+            return FPDF_GetPageCount(document);
+        }
+
 
         [DllImport(NativeLibrary)]
         private static extern PageHandle FPDF_LoadPage(DocumentHandle document, int page_index);
@@ -135,19 +228,76 @@ namespace PDFium.NET.Native
         }
 
         [DllImport(NativeLibrary)]
+        private static extern float FPDF_GetPageWidthF(PageHandle page);
+
+        public static float GetPageWidthF(PageHandle page)
+        {
+            return FPDF_GetPageWidthF(page);
+        }
+
+        [DllImport(NativeLibrary)]
+        private static extern double FPDF_GetPageWidth(PageHandle page);
+
+        public static double GetPageWidth(PageHandle page)
+        {
+            return FPDF_GetPageWidth(page);
+        }
+
+        [DllImport(NativeLibrary)]
+        private static extern float FPDF_GetPageHeightF(PageHandle page);
+
+        public static float GetPageHeightF(PageHandle page)
+        {
+            return FPDF_GetPageHeightF(page);
+        }
+
+        [DllImport(NativeLibrary)]
+        private static extern double FPDF_GetPageHeight(PageHandle page);
+
+        public static double GetPageHeight(PageHandle page)
+        {
+            return FPDF_GetPageHeight(page);
+        }
+
+        [DllImport(NativeLibrary)]
+        private static extern bool FPDF_GetPageBoundingBox(PageHandle page, out FS_RECTF rect);
+
+        public static bool GetPageBoundingBox(PageHandle page, out FS_RECTF rect)
+        {
+            return FPDF_GetPageBoundingBox(page, out rect);
+        }
+
+        [DllImport(NativeLibrary)]
+        private static extern bool FPDF_GetPageSizeByIndexF(DocumentHandle document, int page_index, out FS_SIZEF size);
+
+        public static bool GetPageSizeByIndexF(DocumentHandle document, int page_index, out FS_SIZEF size)
+        {
+            return FPDF_GetPageSizeByIndexF(document, page_index, out size);
+        }
+
+        [DllImport(NativeLibrary)]
+        private static extern int FPDF_GetPageSizeByIndex(DocumentHandle document, int page_index, out double width, out double height);
+
+        public static int GetPageSizeByIndex(DocumentHandle document, int page_index, out double width,
+            out double height)
+        {
+            return FPDF_GetPageSizeByIndex(document, page_index, out width, out height);
+        }
+
+        [DllImport(NativeLibrary)]
+        private static extern void FPDF_CloseDocument(DocumentHandle document);
+
+        public static void CloseDocument(DocumentHandle document)
+        {
+            FPDF_CloseDocument(document);
+        }
+
+        [DllImport(NativeLibrary)]
         private static extern void FPDF_ClosePage(PageHandle page);
 
         public static void ClosePage(PageHandle page)
         {
             FPDF_ClosePage(page);
-        }
-
-        [DllImport(NativeLibrary)]
-        private static extern int FPDF_GetPageCount(DocumentHandle document);
-
-        public static int GetPageCount(DocumentHandle document)
-        {
-            return FPDF_GetPageCount(document);
         }
     }
 }
