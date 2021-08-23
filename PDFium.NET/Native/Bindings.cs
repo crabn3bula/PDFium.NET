@@ -71,6 +71,28 @@ namespace PDFium.NET.Native
         FPDF_CONVERT_FILL_TO_STROKE = 0x20
     }
 
+    public enum PageOrientation
+    {
+        Normal = 0,
+        RotateClockwise90 = 1,
+        Rotate180 = 2,
+        RotateCounterClockwise90 = 3
+    }
+
+    public enum BitmapFormat
+    {
+        // Unknown or unsupported format.
+        Unknown = 0,
+        // Gray scale bitmap, one byte per pixel.
+        Gray = 1,
+        // 3 bytes per pixel, byte order: blue, green, red.
+        BGR = 2,
+        // 4 bytes per pixel, byte order: blue, green, red, unused.
+        BGRx = 3,
+        // 4 bytes per pixel, byte order: blue, green, red, alpha.
+        BGRA = 4
+    }
+
     public class FS_RECTF
     {
         public float left;
@@ -87,10 +109,20 @@ namespace PDFium.NET.Native
 
     public class FPDF_COLORSCHEME
     {
-        int path_fill_color;
-        int path_stroke_color;
-        int text_fill_color;
-        int text_stroke_color;
+        public int path_fill_color;
+        public int path_stroke_color;
+        public int text_fill_color;
+        public int text_stroke_color;
+    }
+
+    public class FS_MATRIX
+    {
+        public float a;
+        public float b;
+        public float c;
+        public float d;
+        public float e;
+        public float f;
     }
 
     static class Bindings
@@ -285,11 +317,30 @@ namespace PDFium.NET.Native
         }
 
         [DllImport(NativeLibrary)]
-        private static extern void FPDF_CloseDocument(DocumentHandle document);
+        private static extern void FPDF_RenderPage(IntPtr dc, PageHandle page, int start_x, int start_y, int size_x, int size_y, PageOrientation rotate, PageRenderingFlags flags);
 
-        public static void CloseDocument(DocumentHandle document)
+        public static void RenderPage(IntPtr dc, PageHandle page, int start_x, int start_y, int size_x, int size_y, PageOrientation rotate, PageRenderingFlags flags)
         {
-            FPDF_CloseDocument(document);
+            FPDF_RenderPage(dc, page, start_x, start_y, size_x, size_y, rotate, flags);
+        }
+
+        [DllImport(NativeLibrary)]
+        private static extern void FPDF_RenderPageBitmap(BitmapHandle bitmap, PageHandle page, int start_x, int start_y, int size_x, int size_y, int rotate, PageRenderingFlags flags);
+
+        public static void RenderPageBitmap(BitmapHandle bitmap, PageHandle page, int start_x, int start_y, int size_x,
+            int size_y, int rotate, PageRenderingFlags flags)
+        {
+            FPDF_RenderPageBitmap(bitmap, page, start_x, start_y, size_x, size_y, rotate, flags);
+        }
+
+        [DllImport(NativeLibrary)]
+        private static extern void FPDF_RenderPageBitmapWithMatrix(BitmapHandle bitmap, PageHandle page, out FS_MATRIX matrix, 
+            out FS_RECTF clipping, PageRenderingFlags flags);
+
+        public static void RenderPageBitmapWithMatrix(BitmapHandle bitmap, PageHandle page, out FS_MATRIX matrix,
+            out FS_RECTF clipping, PageRenderingFlags flags)
+        {
+            FPDF_RenderPageBitmapWithMatrix(bitmap, page, out matrix, out clipping, flags);
         }
 
         [DllImport(NativeLibrary)]
@@ -298,6 +349,145 @@ namespace PDFium.NET.Native
         public static void ClosePage(PageHandle page)
         {
             FPDF_ClosePage(page);
+        }
+
+        [DllImport(NativeLibrary)]
+        private static extern void FPDF_CloseDocument(DocumentHandle document);
+
+        public static void CloseDocument(DocumentHandle document)
+        {
+            FPDF_CloseDocument(document);
+        }
+
+        [DllImport(NativeLibrary)]
+        private static extern bool FPDF_DeviceToPage(PageHandle page, int start_x, int start_y, int size_x, int size_y, PageOrientation rotate, int device_x, int device_y, out double page_x, out double page_y);
+
+        public static bool DeviceToPage(PageHandle page, int start_x, int start_y, int size_x, int size_y,
+            PageOrientation rotate, int device_x, int device_y, out double page_x, out double page_y)
+        {
+            return FPDF_DeviceToPage(page, start_x, start_y, size_x, size_y, rotate, device_x, device_y, out page_x,
+                out page_y);
+        }
+
+        [DllImport(NativeLibrary)]
+        private static extern bool FPDF_PageToDevice(PageHandle page, int start_x, int start_y, int size_x, int size_y, PageOrientation rotate, double page_x, double page_y, out int device_x, out int device_y);
+
+        public static bool PageToDevice(PageHandle page, int start_x, int start_y, int size_x, int size_y, PageOrientation rotate, double page_x, double page_y, out int device_x, out int device_y)
+        {
+            return FPDF_PageToDevice(page, start_x, start_y, size_x, size_y, rotate, page_x, page_y, out device_x,
+                out device_y);
+        }
+
+        [DllImport(NativeLibrary)]
+        private static extern BitmapHandle FPDFBitmap_Create(int width, int height, int alpha);
+
+        public static BitmapHandle BitmapCreate(int width, int height, int alpha)
+        {
+            return FPDFBitmap_Create(width, height, alpha);
+        }
+
+        [DllImport(NativeLibrary)]
+        private static extern BitmapHandle FPDFBitmap_CreateEx(int width, int height, BitmapFormat format, IntPtr first_scan, int stride);
+
+        public static BitmapHandle BitmapCreateEx(int width, int height, BitmapFormat format, IntPtr first_scan, int stride)
+        {
+            return FPDFBitmap_CreateEx(width, height, format, first_scan, stride);
+        }
+
+        [DllImport(NativeLibrary)]
+        private static extern BitmapFormat FPDFBitmap_GetFormat(BitmapHandle bitmap);
+
+        public static BitmapFormat BitmapGetFormat(BitmapHandle bitmap)
+        {
+            return FPDFBitmap_GetFormat(bitmap);
+        }
+
+        [DllImport(NativeLibrary)]
+        private static extern void FPDFBitmap_FillRect(BitmapHandle bitmap, int left, int top, int width, int height, int color);
+
+        public static void BitmapFillRect(BitmapHandle bitmap, int left, int top, int width, int height, int color)
+        {
+            FPDFBitmap_FillRect(bitmap, left, top, width, height, color);
+        }
+
+        [DllImport(NativeLibrary)]
+        private static extern IntPtr FPDFBitmap_GetBuffer(BitmapHandle bitmap);
+
+        public static IntPtr BitmapGetBuffer(BitmapHandle bitmap)
+        {
+            return FPDFBitmap_GetBuffer(bitmap);
+        }
+
+        [DllImport(NativeLibrary)]
+        private static extern int FPDFBitmap_GetWidth(BitmapHandle bitmap);
+
+        public static int BitmapGetWidth(BitmapHandle bitmap)
+        {
+            return FPDFBitmap_GetWidth(bitmap);
+        }
+
+        [DllImport(NativeLibrary)]
+        private static extern int FPDFBitmap_GetHeight(BitmapHandle bitmap);
+
+        public static int BitmapGetHeight(BitmapHandle bitmap)
+        {
+            return FPDFBitmap_GetHeight(bitmap);
+        }
+
+        [DllImport(NativeLibrary)]
+        private static extern int FPDFBitmap_GetStride(BitmapHandle bitmap);
+
+        public static int BitmapGetStride(BitmapHandle bitmap)
+        {
+            return FPDFBitmap_GetStride(bitmap);
+        }
+
+        [DllImport(NativeLibrary)]
+        private static extern void FPDFBitmap_Destroy(BitmapHandle bitmap);
+
+        public static void BitmapDestroy(BitmapHandle bitmap)
+        {
+            FPDFBitmap_Destroy(bitmap);
+        }
+
+        [DllImport(NativeLibrary)]
+        private static extern bool FPDF_VIEWERREF_GetPrintScaling(DocumentHandle document);
+
+        public static bool GetPrintScaling(DocumentHandle document)
+        {
+            return FPDF_VIEWERREF_GetPrintScaling(document);
+        }
+
+        [DllImport(NativeLibrary)]
+        private static extern int FPDF_VIEWERREF_GetNumCopies(DocumentHandle document);
+
+        public static int GetNumCopies(DocumentHandle document)
+        {
+            return FPDF_VIEWERREF_GetNumCopies(document);
+        }
+
+        [DllImport(NativeLibrary)]
+        private static extern IntPtr FPDF_VIEWERREF_GetPrintPageRange(DocumentHandle document);
+
+        public static IntPtr GetPrintPageRange(DocumentHandle document)
+        {
+            return FPDF_VIEWERREF_GetPrintPageRange(document);
+        }
+
+        [DllImport(NativeLibrary)]
+        private static extern int FPDF_VIEWERREF_GetPrintPageRangeCount(IntPtr pagerange);
+
+        public static int GetPrintPageRangeCount(IntPtr pageRange)
+        {
+            return FPDF_VIEWERREF_GetPrintPageRangeCount(pageRange);
+        }
+
+        [DllImport(NativeLibrary)]
+        private static extern int FPDF_VIEWERREF_GetPrintPageRangeElement(IntPtr pagerange, int index);
+
+        public static int GetPrintPageRangeElement(IntPtr pageRange, int index)
+        {
+            return FPDF_VIEWERREF_GetPrintPageRangeElement(pageRange, index);
         }
     }
 }
