@@ -93,6 +93,14 @@ namespace PDFium.NET.Native
         BGRA = 4
     }
 
+    public enum DuplexType
+    {
+        DuplexUndefined = 0,
+        Simplex,
+        DuplexFlipShortEdge,
+        DuplexFlipLongEdge
+    }
+
     public class FS_RECTF
     {
         public float left;
@@ -125,6 +133,12 @@ namespace PDFium.NET.Native
         public float f;
     }
 
+    public class FPDF_BSTR
+    {
+        public string str; // String buffer, manipulate only with FPDF_BStr_* methods.
+        public int len;    // Length of the string, in bytes.
+    }
+
     static class Bindings
     {
         private const string NativeLibrary = "pdfium.dll";
@@ -135,6 +149,14 @@ namespace PDFium.NET.Native
         public static void InitLibrary()
         {
             FPDF_InitLibrary();
+        }
+
+        [DllImport(NativeLibrary)]
+        private static extern void FPDF_DestroyLibrary();
+
+        public static void DestroyLibrary()
+        {
+            FPDF_DestroyLibrary();
         }
 
         [DllImport(NativeLibrary)]
@@ -184,8 +206,7 @@ namespace PDFium.NET.Native
         }
 
         [DllImport(NativeLibrary)]
-        private static extern DocumentHandle
-            FPDF_LoadMemDocument64(DocumentHandle data_buf, long size, string password);
+        private static extern DocumentHandle FPDF_LoadMemDocument64(DocumentHandle data_buf, long size, string password);
 
         public static DocumentHandle LoadMemDocument64(DocumentHandle dataBuffer, long size, string password)
         {
@@ -249,7 +270,6 @@ namespace PDFium.NET.Native
         {
             return FPDF_GetPageCount(document);
         }
-
 
         [DllImport(NativeLibrary)]
         private static extern PageHandle FPDF_LoadPage(DocumentHandle document, int page_index);
@@ -488,6 +508,103 @@ namespace PDFium.NET.Native
         public static int GetPrintPageRangeElement(IntPtr pageRange, int index)
         {
             return FPDF_VIEWERREF_GetPrintPageRangeElement(pageRange, index);
+        }
+
+        [DllImport(NativeLibrary)]
+        private static extern DuplexType FPDF_VIEWERREF_GetDuplex(DocumentHandle document);
+
+        public static DuplexType GetDuplex(DocumentHandle document)
+        {
+            return FPDF_VIEWERREF_GetDuplex(document);
+        }
+
+        [DllImport(NativeLibrary)]
+        private static extern ulong FPDF_VIEWERREF_GetName(DocumentHandle document, string key, out byte[] buffer, ulong length);
+
+        public static ulong GetName(DocumentHandle document, string key, out byte[] buffer, ulong length)
+        {
+            return FPDF_VIEWERREF_GetName(document, key, out buffer, length);
+        }
+
+        [DllImport(NativeLibrary)]
+        private static extern int FPDF_CountNamedDests(DocumentHandle document);
+
+        public static int CountNamedDests(DocumentHandle document)
+        {
+            return FPDF_CountNamedDests(document);
+        }
+
+        [DllImport(NativeLibrary)]
+        private static extern IntPtr FPDF_GetNamedDestByName(DocumentHandle document, string name);
+
+        public static IntPtr GetNamedDestByName(DocumentHandle document, string name)
+        {
+            return FPDF_GetNamedDestByName(document, name);
+        }
+
+        [DllImport(NativeLibrary)]
+        private static extern int FPDF_GetXFAPacketCount(DocumentHandle document);
+
+        public static int GetXFAPacketCount(DocumentHandle document)
+        {
+            return FPDF_GetXFAPacketCount(document);
+        }
+
+        [DllImport(NativeLibrary)]
+        private static extern ulong FPDF_GetXFAPacketName(DocumentHandle document, int index, out byte[] buffer, ulong buflen);
+
+        public static ulong GetXFAPacketName(DocumentHandle document, int index, out byte[] buffer, ulong buflen)
+        {
+            return FPDF_GetXFAPacketName(document, index, out buffer, buflen);
+        }
+
+        [DllImport(NativeLibrary)]
+        private static extern bool FPDF_GetXFAPacketContent(DocumentHandle document, int index, out byte[] buffer, ulong buflen, out ulong out_buflen);
+
+        public static bool GetXFAPacketContent(DocumentHandle document, int index, out byte[] buffer, ulong buflen,
+            out ulong out_buflen)
+        {
+            return FPDF_GetXFAPacketContent(document, index, out buffer, buflen, out out_buflen);
+        }
+
+        [DllImport(NativeLibrary)]
+        private static extern string FPDF_GetRecommendedV8Flags();
+
+        public static string GetRecommendedV8Flags()
+        {
+            return FPDF_GetRecommendedV8Flags();
+        }
+
+        [DllImport(NativeLibrary)]
+        private static extern IntPtr FPDF_GetArrayBufferAllocatorSharedInstance();
+
+        public static IntPtr GetArrayBufferAllocatorSharedInstance()
+        {
+            return FPDF_GetArrayBufferAllocatorSharedInstance();
+        }
+
+        [DllImport(NativeLibrary)]
+        private static extern int FPDF_BStr_Init(out FPDF_BSTR bstr);
+
+        public static int BStrInit(out FPDF_BSTR bstr)
+        {
+            return FPDF_BStr_Init(out bstr);
+        }
+
+        [DllImport(NativeLibrary)]
+        private static extern int FPDF_BStr_Set(out FPDF_BSTR bstr, string cstr, int length);
+
+        public static int BStrSet(out FPDF_BSTR bstr, string cstr, int length)
+        {
+            return FPDF_BStr_Set(out bstr, cstr, length);
+        }
+
+        [DllImport(NativeLibrary)]
+        private static extern int FPDF_BStr_Clear(out FPDF_BSTR bstr);
+
+        public static int BStrClear(out FPDF_BSTR bstr)
+        {
+            return FPDF_BStr_Clear(out bstr);
         }
     }
 }
