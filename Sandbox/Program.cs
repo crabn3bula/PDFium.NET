@@ -9,6 +9,7 @@ namespace Sandbox
         {
             const string testFile = "example.pdf";
             Console.WriteLine("PDFium.NET sandbox");
+
             using (var document = Document.Load(testFile, ""))
             {
                 using (var page = document.GetPage(0))

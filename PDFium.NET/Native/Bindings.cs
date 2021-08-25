@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.ComTypes;
 
 [assembly: InternalsVisibleTo("PDFium.NET.Test")]
 namespace PDFium.NET.Native
@@ -198,9 +199,9 @@ namespace PDFium.NET.Native
         }
 
         [DllImport(NativeLibrary)]
-        private static extern DocumentHandle FPDF_LoadMemDocument(DocumentHandle data_buf, int size, string password);
+        private static extern DocumentHandle FPDF_LoadMemDocument(IntPtr data_buf, int size, string password);
 
-        public static DocumentHandle LoadMemDocument(DocumentHandle dataBuffer, int size, string password)
+        public static DocumentHandle LoadMemDocument(IntPtr dataBuffer, int size, string password)
         {
             return FPDF_LoadMemDocument(dataBuffer, size, password);
         }
