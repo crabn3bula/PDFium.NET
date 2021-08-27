@@ -12,12 +12,8 @@ namespace Sandbox
 
             using (var document = Document.Load(testFile, ""))
             {
-                using (var page = document.GetPage(0))
-                {
-
-                }
                 Console.WriteLine($"Document {testFile} is opened");
-                Console.WriteLine($"Pages count is {document.PagesCount}");
+                Console.WriteLine($"Pages count is {document.Pages.Count}");
             }
 
             Console.ReadLine();

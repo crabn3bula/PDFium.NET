@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.ComTypes;
 
 [assembly: InternalsVisibleTo("PDFium.NET.Test")]
 namespace PDFium.NET.Native

@@ -21,9 +21,9 @@ namespace PDFium.NET
         private readonly Stream _stream;
 
         /// <summary>
-        /// Gets the count of PDF document pages. 
+        /// Collection of document pages.
         /// </summary>
-        public int PagesCount { get; }
+        public PagesCollection Pages { get; }
 
         /// <summary>
         /// Loads PDF document from file path.
@@ -80,7 +80,12 @@ namespace PDFium.NET
         {
             Bindings.InitLibrary();
             _handle = Bindings.LoadDocument(filePath, password);
-            PagesCount = Bindings.GetPageCount(_handle);
+            if (_handle == null)
+            {
+                throw new Exception("Cant load document");
+            }
+
+            Pages = new PagesCollection(_handle);
         }
 
         /// <summary>
@@ -101,18 +106,12 @@ namespace PDFium.NET
             Bindings.InitLibrary();
             // TODO: handle stream
             //_handle = Bindings.LoadMemDocument(_stream, _stream.Length, password);
-            PagesCount = Bindings.GetPageCount(_handle);
-        }
+            if (_handle == null)
+            {
+                throw new Exception("Cant load document");
+            }
 
-        /// <summary>
-        /// Loads document page by index and returns it.
-        /// </summary>
-        /// <param name="pageIndex">Requested document's page index.</param>
-        /// <returns>The new page.</returns>
-        public Page GetPage(int pageIndex)
-        {
-            var pageHandle = Bindings.LoadPage(_handle, pageIndex);
-            return new Page(pageHandle);
+            Pages = new PagesCollection(_handle);
         }
 
         /// <summary>

@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace PDFium.NET.Native
 {
-    class DocumentHandle : SafeHandle
+    internal class DocumentHandle : SafeHandle
     {
         private DocumentHandle() : base(IntPtr.Zero, true) {}
 
