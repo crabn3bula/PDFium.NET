@@ -18,6 +18,7 @@ namespace Sandbox
             using (var document = Document.Load(simpleFile))
             {
                 Console.WriteLine($"Document {simpleFile} is opened");
+                Console.WriteLine($"PDF version is {document.Version}");
                 Console.WriteLine($"Pages count is {document.Pages.Count}");
                 foreach (var page in document.Pages)
                 {
@@ -29,6 +30,7 @@ namespace Sandbox
             using (var document = Document.Load(destinationsFile))
             {
                 Console.WriteLine($"Document {destinationsFile} is opened");
+                Console.WriteLine($"PDF version is {document.Version}");
                 Console.WriteLine($"Destinations count is {document.Destinations.Count}");
                 foreach (var destination in document.Destinations)
                 {

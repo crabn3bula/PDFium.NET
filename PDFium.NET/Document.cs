@@ -21,6 +21,12 @@ namespace PDFium.NET
         private readonly Stream _stream;
 
         /// <summary>
+        /// PDF document version
+        /// 14 for 1.4, 15 for 1.5, ...
+        /// </summary>
+        public int Version { get; }
+
+        /// <summary>
         /// Collection of document pages.
         /// </summary>
         public PagesCollection Pages { get; }
@@ -90,6 +96,8 @@ namespace PDFium.NET
                 throw new Exception("Cant load document");
             }
 
+            Bindings.GetFileVersion(_handle, out var version);
+            Version = version;
             Pages = new PagesCollection(_handle);
             Destinations = new DestinationsCollection(_handle);
         }
