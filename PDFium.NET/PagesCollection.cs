@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.Serialization.Formatters;
 using JetBrains.Annotations;
 using PDFium.NET.Native;
 
@@ -30,6 +31,10 @@ namespace PDFium.NET
             _documentHandle = document;
             var pagesCount = Bindings.GetPageCount(_documentHandle);
             _pages = new List<Page>(pagesCount);
+            for (var pageNumber = 0; pageNumber < pagesCount - 1; ++pageNumber)
+            {
+                _pages.Add(new Page(_documentHandle, pageNumber));
+            }
         }
 
         /// <summary>
