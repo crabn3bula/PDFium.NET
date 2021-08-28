@@ -62,12 +62,15 @@ namespace PDFium.NET
             var bitmap = new Bitmap(width, height, PixelFormat.Format32bppArgb);
             bitmap.SetResolution(xDpi, yDpi);
 
-            var bitmapHandle = Bindings.BitmapCreate(width, height, 0);
+            var data = bitmap.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadWrite, bitmap.PixelFormat);
+
+            var bitmapHandle = Bindings.BitmapCreateEx(width, height, BitmapFormat.BGRA, data.Scan0, data.Stride);
             Bindings.BitmapFillRect(bitmapHandle, 0, 0, width, height, 0x00FFFFFF);
 
             Bindings.RenderPageBitmap(bitmapHandle, _handle, 0, 0, width, height, 0, flags);
             Bindings.BitmapDestroy(bitmapHandle);
 
+            bitmap.UnlockBits(data);
             return bitmap;
         }
 

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.Serialization.Formatters;
 using JetBrains.Annotations;
 using PDFium.NET.Native;
 

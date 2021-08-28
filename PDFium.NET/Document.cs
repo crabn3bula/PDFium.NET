@@ -26,6 +26,11 @@ namespace PDFium.NET
         public PagesCollection Pages { get; }
 
         /// <summary>
+        /// Collection of document destinations.
+        /// </summary>
+        public DestinationsCollection Destinations { get; }
+
+        /// <summary>
         /// Loads PDF document from file path.
         /// </summary>
         /// <param name="filePath">Path to PDF file.</param>
@@ -86,6 +91,7 @@ namespace PDFium.NET
             }
 
             Pages = new PagesCollection(_handle);
+            Destinations = new DestinationsCollection(_handle);
         }
 
         /// <summary>
@@ -112,6 +118,7 @@ namespace PDFium.NET
             }
 
             Pages = new PagesCollection(_handle);
+            Destinations = new DestinationsCollection(_handle);
         }
 
         /// <summary>

@@ -529,17 +529,26 @@ namespace PDFium.NET.Native
         [DllImport(NativeLibrary)]
         private static extern int FPDF_CountNamedDests(DocumentHandle document);
 
-        public static int CountNamedDests(DocumentHandle document)
+        public static int CountNamedDestinations(DocumentHandle document)
         {
             return FPDF_CountNamedDests(document);
         }
 
         [DllImport(NativeLibrary)]
-        private static extern IntPtr FPDF_GetNamedDestByName(DocumentHandle document, string name);
+        private static extern DestinationHandle FPDF_GetNamedDestByName(DocumentHandle document, string name);
 
-        public static IntPtr GetNamedDestByName(DocumentHandle document, string name)
+        public static DestinationHandle GetNamedDestinationByName(DocumentHandle document, string name)
         {
             return FPDF_GetNamedDestByName(document, name);
+        }
+
+        [DllImport(NativeLibrary)]
+        private static extern DestinationHandle FPDF_GetNamedDest(DocumentHandle document, int index, out byte[] buffer, out ulong buflen);
+
+        public static DestinationHandle GetNamedDestination(DocumentHandle document, int index, out byte[] buffer,
+            out ulong buflen)
+        {
+            return FPDF_GetNamedDest(document, index, out buffer, out buflen);
         }
 
         [DllImport(NativeLibrary)]
