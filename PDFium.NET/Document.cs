@@ -21,6 +21,51 @@ namespace PDFium.NET
         private readonly Stream _stream;
 
         /// <summary>
+        /// Document's title.
+        /// </summary>
+        public string Title => Bindings.GetMetaText(_handle, DocumentMetaTag.Title);
+
+        /// <summary>
+        /// Document's author.
+        /// </summary>
+        public string Author => Bindings.GetMetaText(_handle, DocumentMetaTag.Author);
+
+        /// <summary>
+        /// Document's subject.
+        /// </summary>
+        public string Subject => Bindings.GetMetaText(_handle, DocumentMetaTag.Subject);
+
+        /// <summary>
+        /// Document's keywords.
+        /// </summary>
+        public string Keywords => Bindings.GetMetaText(_handle, DocumentMetaTag.Keywords);
+
+        /// <summary>
+        /// Document's creator.
+        /// </summary>
+        public string Creator => Bindings.GetMetaText(_handle, DocumentMetaTag.Creator);
+
+        /// <summary>
+        /// Document's producer.
+        /// </summary>
+        public string Producer => Bindings.GetMetaText(_handle, DocumentMetaTag.Producer);
+
+        /// <summary>
+        /// Document's creation date.
+        /// </summary>
+        public string CreationDate => Bindings.GetMetaText(_handle, DocumentMetaTag.CreationDate);
+
+        /// <summary>
+        /// Document's modification date.
+        /// </summary>
+        public string ModDate => Bindings.GetMetaText(_handle, DocumentMetaTag.ModDate);
+
+        /// <summary>
+        /// Document's trapped flag.
+        /// </summary>
+        public string Trapped => Bindings.GetMetaText(_handle, DocumentMetaTag.Trapped);
+
+        /// <summary>
         /// PDF document version
         /// 14 for 1.4, 15 for 1.5, ...
         /// </summary>

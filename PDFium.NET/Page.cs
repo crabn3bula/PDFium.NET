@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
 using PDFium.NET.Native;
 
 namespace PDFium.NET
@@ -11,6 +12,11 @@ namespace PDFium.NET
         /// Document handle.
         /// </summary>
         private readonly DocumentHandle _documentHandle;
+
+        /// <summary>
+        /// Page handle instance.
+        /// </summary>
+        private readonly PageHandle _handle;
 
         /// <summary>
         /// Page number.
@@ -27,10 +33,18 @@ namespace PDFium.NET
         /// </summary>
         public float Height { get; }
 
-        /// <summary>
-        /// Page handle instance.
-        /// </summary>
-        private readonly PageHandle _handle;
+        public Image Thumbnail
+        {
+            get
+            {
+                var buffer = Bindings.GetThumbnailBitmap(_handle);
+                var err = Bindings.GetLastError();
+                using (var ms = new MemoryStream(buffer))
+                {
+                    return Image.FromStream(ms);
+                }
+            }
+        }
 
         /// <summary>
         /// Creates a page and loads it.

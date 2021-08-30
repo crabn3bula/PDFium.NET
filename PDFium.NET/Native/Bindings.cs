@@ -1,6 +1,8 @@
 ﻿using System;
+using System.IO;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Text;
 
 [assembly: InternalsVisibleTo("PDFium.NET.Test")]
 namespace PDFium.NET.Native
@@ -99,6 +101,19 @@ namespace PDFium.NET.Native
         Simplex,
         DuplexFlipShortEdge,
         DuplexFlipLongEdge
+    }
+
+    public enum DocumentMetaTag
+    {
+        Title,
+        Author,
+        Subject,
+        Keywords,
+        Creator,
+        Producer,
+        CreationDate,
+        ModDate,
+        Trapped
     }
 
     public class FS_RECTF
@@ -614,6 +629,34 @@ namespace PDFium.NET.Native
         public static int BStrClear(out FPDF_BSTR bstr)
         {
             return FPDF_BStr_Clear(out bstr);
+        }
+
+        // fpdf_thumbnail.h
+        [DllImport(NativeLibrary)]
+        private static extern byte[] FPDFPage_GetThumbnailAsBitmap(PageHandle page);
+
+        public static byte[] GetThumbnailBitmap(PageHandle page)
+        {
+            return FPDFPage_GetThumbnailAsBitmap(page);
+        }
+
+        // fpdf_doc.h
+
+        [DllImport(NativeLibrary)]
+        private static extern ulong FPDF_GetMetaText(DocumentHandle document, string tag, out byte[] buffer, ulong buflen);
+
+        public static string GetMetaText(DocumentHandle document, DocumentMetaTag tag)
+        {
+            // TODO: error handling.
+            // first call - get buffer length
+            var bufferSize = FPDF_GetMetaText(document, tag.ToString(), out var buffer, 0);
+            buffer = new byte[bufferSize];
+            FPDF_GetMetaText(document, tag.ToString(), out buffer, bufferSize);
+
+            // The buffer is always encoded in UTF-16LE.
+            return buffer != null 
+                ? Encoding.Unicode.GetString(buffer)
+                : string.Empty;
         }
     }
 }
