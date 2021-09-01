@@ -7,6 +7,8 @@ namespace PDFium.NET.Test
     {
         private const string DocumentPath = "example.pdf";
 
+        private const string DocumentPath2 = "example-dest.pdf";
+
         [Fact]
         public void InitLibrary()
         {
@@ -21,6 +23,12 @@ namespace PDFium.NET.Test
             var document = Bindings.LoadDocument(DocumentPath, "");
             Assert.NotNull(document);
             Assert.False(document.IsInvalid);
+        }
+
+        [Fact]
+        public void ConcurrentAccess()
+        {
+            // TODO: add checks
         }
     }
 }
