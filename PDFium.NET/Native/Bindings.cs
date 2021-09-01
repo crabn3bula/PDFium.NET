@@ -643,20 +643,25 @@ namespace PDFium.NET.Native
         // fpdf_doc.h
 
         [DllImport(NativeLibrary)]
-        private static extern ulong FPDF_GetMetaText(DocumentHandle document, string tag, out byte[] buffer, ulong buflen);
+        private static extern ulong FPDF_GetMetaText(DocumentHandle document, string tag, byte[] buffer, ulong buflen);
 
         public static string GetMetaText(DocumentHandle document, DocumentMetaTag tag)
         {
             // TODO: error handling.
             // first call - get buffer length
-            var bufferSize = FPDF_GetMetaText(document, tag.ToString(), out var buffer, 0);
-            buffer = new byte[bufferSize];
-            FPDF_GetMetaText(document, tag.ToString(), out buffer, bufferSize);
+            byte[] buffer = null;
+            var bufferSize = FPDF_GetMetaText(document, tag.ToString(), buffer, 0);
+            if (bufferSize == 0)
+            {
+                return string.Empty;
+            }
 
-            // The buffer is always encoded in UTF-16LE.
-            return buffer != null 
-                ? Encoding.Unicode.GetString(buffer)
-                : string.Empty;
+            // second call with pre-allocated buffer returns actual data.
+            buffer = new byte[bufferSize];
+            FPDF_GetMetaText(document, tag.ToString(), buffer, bufferSize);
+
+            // The buffer is always null-terminated string encoded in UTF-16LE 
+            return Encoding.Unicode.GetString(buffer).TrimEnd(default(char));
         }
     }
 }
